@@ -1,0 +1,316 @@
+@import '@astryxdesign/theme-neutral/fonts.css';
+@import '@astryxdesign/core/reset.css';
+@import '@astryxdesign/core/astryx.css';
+@import '@astryxdesign/theme-neutral/theme.css';
+
+body {
+  font-family: var(--font-family-body, system-ui, -apple-system, 'PingFang HK', 'Microsoft JhengHei', sans-serif);
+  margin: 0;
+}
+
+.app-shell {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px 20px 64px;
+}
+
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  margin-bottom: 4px;
+}
+
+.app-header h1 {
+  font-size: 24px;
+  margin: 0;
+}
+
+.app-header .company {
+  color: #555;
+  font-size: 14px;
+}
+
+.tiffany-rule {
+  height: 3px;
+  background: #81d8d0;
+  border-radius: 2px;
+  margin: 10px 0 18px;
+}
+
+.tab-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: end;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.toolbar .search-box {
+  min-width: 240px;
+  flex: 1;
+  max-width: 420px;
+}
+
+.summary-line {
+  font-size: 15px;
+  margin: 0 0 14px;
+}
+
+.summary-line strong {
+  font-size: 17px;
+}
+
+.cell-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.form-card {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 760px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 6px;
+}
+
+.form-grid .full {
+  grid-column: 1 / -1;
+}
+
+.date-field label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.date-field input[type='date'] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit;
+  background: #fff;
+}
+
+.item-row {
+  display: grid;
+  grid-template-columns: 1fr 160px auto;
+  gap: 10px;
+  align-items: end;
+  margin-bottom: 10px;
+}
+
+.form-total {
+  text-align: right;
+  font-size: 17px;
+  margin: 12px 0 18px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.form-error {
+  color: #b3261e;
+  margin: 10px 0 0;
+  font-size: 14px;
+}
+
+.empty-note {
+  color: #666;
+  padding: 18px 4px;
+}
+
+/* ---------- confirmation dialog ---------- */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 16px;
+}
+
+.dialog-box {
+  background: #fff;
+  border-radius: 14px;
+  padding: 22px;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+.dialog-box h2 {
+  margin: 0 0 10px;
+  font-size: 19px;
+}
+
+.dialog-box p {
+  margin: 0 0 10px;
+  line-height: 1.55;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+/* ---------- printable document ---------- */
+.doc-sheet {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 40px 44px;
+  max-width: 760px;
+  margin: 0 auto;
+  color: #111;
+}
+
+.doc-company-en {
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.doc-company-tc {
+  font-size: 16px;
+  margin-top: 2px;
+}
+
+.doc-tiffany {
+  height: 3px;
+  background: #81d8d0;
+  margin: 12px 0 20px;
+}
+
+.doc-title {
+  font-size: 19px;
+  font-weight: 700;
+  margin: 0 0 14px;
+}
+
+.doc-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 18px;
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+.doc-meta dt {
+  font-weight: 600;
+}
+
+.doc-meta dd {
+  margin: 0;
+}
+
+table.doc-items {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+table.doc-items th,
+table.doc-items td {
+  text-align: left;
+  padding: 8px 6px;
+  border-bottom: 1px solid #e3e3e3;
+}
+
+table.doc-items th.amount,
+table.doc-items td.amount {
+  text-align: right;
+}
+
+.doc-total-row {
+  text-align: right;
+  font-size: 17px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.doc-note {
+  margin-top: 22px;
+  font-size: 14px;
+  color: #333;
+}
+
+.doc-paid-line {
+  margin-top: 22px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.doc-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 18px 0 6px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .item-row {
+    grid-template-columns: 1fr 110px auto;
+  }
+  .doc-sheet {
+    padding: 26px 20px;
+  }
+}
+
+/* ---------- print: only the document ---------- */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .doc-sheet,
+  .doc-sheet * {
+    visibility: visible;
+  }
+  .doc-sheet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-width: none;
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    padding: 24px 8px;
+  }
+  .no-print {
+    display: none !important;
+  }
+}

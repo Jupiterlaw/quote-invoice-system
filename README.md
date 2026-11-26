@@ -17,6 +17,20 @@ Jupiter's Design Limited 內部用嘅報價及發票系統。只供公司內部�
 - Astryx 而家仲係試驗版（0.7.x），更新密，升版嗰陣要跟住做保養，呢點接受咗先揀 B。
 - 同公司網站 jupitersdesign.com 分開，唔影響網站嗰邊。
 
+## 程式碼
+
+呢個 repo 入面有一套真・獨立版嘅程式（`src/`），同 Muse Space 上面行緊嗰套係同樣功能、同樣版面，但程式碼完全獨立，唔依賴 Muse 平台。
+
+- **技術：** Vite + React 19 + TypeScript，畫面真用 Meta Astryx 0.7.17 元件（`@astryxdesign/core` 嘅 Theme、Table、Button、TextInput、Badge，配 `@astryxdesign/theme-neutral` 主題），接法跟 Astryx 官方 core README 嘅 Vite 設定（四個 CSS 順序載入 + Theme 包住成個 app，唔使用 build plugin）。
+- **點行：**
+  ```bash
+  npm install
+  npm run dev      # 本地開發（跟終端機顯示嘅網址開）
+  npm run build    # 出正式版（去 dist/）
+  npm run preview  # 睇正式版
+  ```
+- **同 Space 版嘅分別（老實講）：** 呢個 repo 版冇後端伺服器，啲單係存喺**用家自己部機瀏覽器嘅 localStorage** 度；Space 版就存喺 Muse 平台嗰邊嘅資料庫。即係：repo 版換部機／換瀏覽器就睇唔返啲單，亦冇多人共用；好處係程式同數據都喺自己手上，唔綁任何平台。第日決定咗長遠後端放邊（例如自己 VPS 或其他資料庫），只需要換存資料嗰一層（`src/store.ts`），畫面同規則唔使改。
+
 ## 文件
 
 - `docs/PLAN.md` — 一頁紙計劃（文字版）

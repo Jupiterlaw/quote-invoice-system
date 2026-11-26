@@ -1,0 +1,25 @@
+{
+  "name": "quote-invoice-system",
+  "private": true,
+  "scripts": {
+    "build": "tsc --noEmit && vite build",
+    "dev": "vite",
+    "preview": "vite preview"
+  },
+  "type": "module",
+  "version": "0.1.0",
+  "dependencies": {
+    "@astryxdesign/core": "0.7.17",
+    "@astryxdesign/theme-neutral": "0.7.17",
+    "@stylexjs/stylex": "^0.19.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.3",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.4.0"
+  }
+}

@@ -29,7 +29,15 @@ Jupiter's Design Limited 內部用嘅報價及發票系統。只供公司內部�
   npm run build    # 出正式版（去 dist/）
   npm run preview  # 睇正式版
   ```
-- **同 Space 版嘅分別（老實講）：** 呢個 repo 版冇後端伺服器，啲單係存喺**用家自己部機瀏覽器嘅 localStorage** 度；Space 版就存喺 Muse 平台嗰邊嘅資料庫。即係：repo 版換部機／換瀏覽器就睇唔返啲單，亦冇多人共用；好處係程式同數據都喺自己手上，唔綁任何平台。第日決定咗長遠後端放邊（例如自己 VPS 或其他資料庫），只需要換存資料嗰一層（`src/store.ts`），畫面同規則唔使改。
+- **同 Space 版嘅分別（老實講）：** Space 版啲單存喺 Muse 平台嗰邊嘅資料庫；呢個 repo 版而家接咗 **Google Sheet 做後端**（見下節），Space 版同 repo 版仍然係兩套獨立程式、啲單唔互通。
+
+## 後端：Google Sheet（2026-11-27 接入）
+
+- **中央倉：** Google Sheet「報價及發票系統資料」（mynathan159@gmail.com 名下），分頁「報價／發票／收據／設定」，一張單一行，項目清單以 JSON 存入「項目(JSON)」欄，總額另有獨立欄方便人眼睇數。
+- **中間層：** `apps-script/Code.gs`（Google Apps Script Web App，以 mynathan159 名義部署，執行身分「我」、存取「任何人」），負責 Sheet 行 <-> 前端狀態嘅對照。Web App URL 寫喺 `src/sheetsConfig.ts`（URL 本身唔係秘密）。
+- **把關：** 所有讀寫都要帶一把「存取密鑰」（Apps Script 內 SECRET 常數；repo 內只留 placeholder，真正密鑰唔入 repo）。前端喺「設定」頁入密鑰，每部機入一次，存喺嗰部機嘅 localStorage。
+- **同步方式：** 開機由 Sheet 讀最新狀態（Sheet 空、本機有資料時會將本機資料推上去做首次搬遷）；每次改動 debounce 1.2 秒後成份狀態寫返去 Sheet；本機 localStorage 同時做離線快取。同一時間只用一部機改單最穩陣（成份覆寫、冇逐格合併）。
+- **改 Apps Script 後要重新部署：** 編輯器改完 Code.gs，要去「部署 → 管理部署 → 編輯 → 版本：新版本 → 部署」，Web App URL 先會不變之下更新；齋儲存係唔會生效嘅。
 
 ## 文件
 

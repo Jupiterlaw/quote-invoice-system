@@ -43,7 +43,14 @@ body {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  align-items: center;
   margin-bottom: 20px;
+}
+
+.sync-status {
+  margin-left: auto;
+  font-size: 13px;
+  opacity: 0.85;
 }
 
 .toolbar {

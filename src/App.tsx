@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {Badge} from '@astryxdesign/core/Badge';
 import {Button} from '@astryxdesign/core/Button';
 import {Table, proportional} from '@astryxdesign/core/Table';
@@ -6,7 +6,8 @@ import type {TableColumn} from '@astryxdesign/core/Table';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import ConfirmDialog from './components/ConfirmDialog';
 import DocView from './components/DocView';
-import {loadData, saveData} from './store';
+import {fetchRemoteState, isEmptyData, loadData, pushRemoteState, saveData} from './store';
+import {SHEET_URL, WEB_APP_URL, loadSecret, saveSecret} from './sheetsConfig';
 import type {AppData, Invoice, LineItem, Quotation, Receipt} from './types';
 import {totalOf} from './types';
 import {addMonthsISO, formatDate, formatMoney, todayISO, uid} from './utils';
@@ -18,7 +19,8 @@ type View =
   | {kind: 'quote-form'; id: string | null}
   | {kind: 'quote-doc'; id: string}
   | {kind: 'invoice-doc'; id: string}
-  | {kind: 'receipt-doc'; id: string};
+  | {kind: 'receipt-doc'; id: string}
+  | {kind: 'settings'};
 
 type Dialog =
   | {kind: 'delete-quotation'; q: Quotation}
@@ -43,6 +45,88 @@ export default function App() {
   useEffect(() => {
     saveData(data);
   }, [data]);
+
+  // ---------- Google Sheet 同步 ----------
+
+  type SyncStatus = 'off' | 'loading' | 'synced' | 'saving' | 'error';
+  const [secret, setSecret] = useState<string>(() => loadSecret());
+  const [secretInput, setSecretInput] = useState('');
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('off');
+  const hydratedRef = useRef(false);
+  const pushTimerRef = useRef<number | null>(null);
+
+  const syncReady = Boolean(WEB_APP_URL) && Boolean(secret);
+
+  // 開機：有密鑰就由 Sheet 讀最新狀態；Sheet 係空、本機有資料就將本機資料推上去（首次搬遷）
+  useEffect(() => {
+    if (!WEB_APP_URL || !secret) {
+      setSyncStatus('off');
+      hydratedRef.current = false;
+      return;
+    }
+    let cancelled = false;
+    setSyncStatus('loading');
+    fetchRemoteState(secret)
+      .then(async remote => {
+        if (cancelled) return;
+        const local = loadData();
+        if (isEmptyData(remote) && !isEmptyData(local)) {
+          await pushRemoteState(secret, local);
+          if (cancelled) return;
+          setData(local);
+        } else {
+          setData(remote);
+        }
+        hydratedRef.current = true;
+        setSyncStatus('synced');
+      })
+      .catch(() => {
+        if (!cancelled) setSyncStatus('error');
+      });
+    return () => {
+      cancelled = true;
+    };
+    // 只喺密鑰改變時重行
+  }, [secret]);
+
+  // 每次改動：debounce 後推返去 Sheet
+  useEffect(() => {
+    if (!syncReady || !hydratedRef.current) return;
+    setSyncStatus('saving');
+    if (pushTimerRef.current) window.clearTimeout(pushTimerRef.current);
+    pushTimerRef.current = window.setTimeout(() => {
+      pushRemoteState(secret, data)
+        .then(() => setSyncStatus('synced'))
+        .catch(() => setSyncStatus('error'));
+    }, 1200);
+    return () => {
+      if (pushTimerRef.current) window.clearTimeout(pushTimerRef.current);
+    };
+  }, [data, secret, syncReady]);
+
+  const syncLabel =
+    syncStatus === 'synced'
+      ? '☁️ 已同步去 Google Sheet'
+      : syncStatus === 'saving'
+        ? '☁️ 同步緊…'
+        : syncStatus === 'loading'
+          ? '☁️ 載入 Sheet 資料緊…'
+          : syncStatus === 'error'
+            ? '⚠️ 同步失敗（資料暫存喺呢部機，檢查網絡或密鑰）'
+            : '未連接 Google Sheet（去「設定」入密鑰）';
+
+  const applySecret = () => {
+    const v = secretInput.trim();
+    if (!v) return;
+    saveSecret(v);
+    setSecret(v);
+    setSecretInput('');
+  };
+
+  const clearSecret = () => {
+    saveSecret('');
+    setSecret('');
+  };
 
   const invoiceById = (id: string | null) => data.invoices.find(i => i.id === id);
   const receiptById = (id: string | null) => data.receipts.find(r => r.id === id);
@@ -340,6 +424,8 @@ export default function App() {
         {tabButton('quotations', '報價單')}
         {tabButton('invoices', '發票')}
         {tabButton('receipts', '收據')}
+        {tabButton('settings', '設定')}
+        <span className="sync-status">{syncLabel}</span>
       </nav>
 
       {view.kind === 'quotations' && (
@@ -407,6 +493,44 @@ export default function App() {
           ) : (
             <Table data={shownReceipts} columns={receiptColumns} idKey="id" hasHover />
           )}
+        </section>
+      )}
+
+      {view.kind === 'settings' && (
+        <section>
+          <h2>Google Sheet 後端</h2>
+          <p>
+            資料中央倉：<a href={SHEET_URL} target="_blank" rel="noreferrer">「報價及發票系統資料」Google Sheet</a>
+            （報價／發票／收據／編號，一張單一行，你隨時開嚟睇到同備份到。）
+          </p>
+          {secret ? (
+            <>
+              <p>呢部機已設定存取密鑰，狀態：{syncLabel}</p>
+              <Button label="移除呢部機嘅密鑰（停止同步）" variant="secondary" onClick={clearSecret} />
+            </>
+          ) : (
+            <>
+              <p>
+                未設定密鑰嗰陣，資料只存喺呢部機嘅瀏覽器。入返存取密鑰（每部機入一次就得），
+                呢部機就會同 Sheet 同步，電話同電腦睇到同一份單。
+              </p>
+              <div className="toolbar">
+                <div className="search-box">
+                  <TextInput
+                    label="存取密鑰"
+                    isLabelHidden
+                    placeholder="貼上存取密鑰"
+                    value={secretInput}
+                    onChange={setSecretInput}
+                  />
+                </div>
+                <Button label="儲存密鑰並同步" variant="primary" onClick={applySecret} />
+              </div>
+            </>
+          )}
+          <p className="empty-note">
+            注意：同步係成份狀態一齊寫返去 Sheet；同一時間只用一部機改單最穩陣。
+          </p>
         </section>
       )}
 
